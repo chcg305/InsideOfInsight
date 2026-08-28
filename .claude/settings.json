@@ -1,6 +1,6 @@
 {
   "hooks": {
-    "postToolUse": [
+    "PostToolUse": [
       {
         "tool": ["Edit", "Write"],
         "event": "after",
@@ -8,7 +8,7 @@
         "description": "파일 수정 직후 검증 (JS 문법, git 상태, 파일 무결성)"
       }
     ],
-    "preToolUse": [
+    "PreToolUse": [
       {
         "tool": ["Bash"],
         "event": "before",
