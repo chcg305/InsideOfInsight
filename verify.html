@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>✅ 최종 검증</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif; padding: 30px; max-width: 1000px; margin: 0 auto; background: #f5f5f5; }
+  h1 { color: #333; border-bottom: 3px solid #2196f3; padding-bottom: 10px; }
+  .section { background: white; margin: 20px 0; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+  .test { margin: 15px 0; padding: 12px; border-left: 4px solid #ddd; border-radius: 4px; }
+  .pass { border-left-color: #4caf50; background: #f1f8f6; color: #1b5e20; }
+  .fail { border-left-color: #f44336; background: #fef5f5; color: #b71c1c; }
+  .code { background: #f5f5f5; padding: 10px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 12px; margin: 5px 0; }
+  .progress { display: inline-block; width: 200px; height: 20px; background: #e0e0e0; border-radius: 10px; overflow: hidden; vertical-align: middle; margin-left: 10px; }
+  .progress-bar { height: 100%; background: linear-gradient(90deg, #4caf50, #45a049); transition: width 0.3s; }
+  button { padding: 10px 20px; margin-top: 10px; background: #2196f3; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+  button:hover { background: #1976d2; }
+</style>
+</head>
+<body>
+<h1>🔬 InsideToInsight — 최종 검증</h1>
+
+<div class="section">
+  <h2>📋 검증 항목</h2>
+  <div id="tests"></div>
+  <div style="margin-top: 20px;">
+    <strong>진행도:</strong>
+    <div class="progress" style="width: 300px;">
+      <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+    </div>
+    <span id="progressText">0/0</span>
+  </div>
+</div>
+
+<div class="section" id="console" style="display: none;">
+  <h2>🖥️ 콘솔 출력</h2>
+  <div id="consoleOutput" style="background: #1e1e1e; color: #00ff00; padding: 10px; border-radius: 4px; font-family: 'Courier New', monospace; max-height: 300px; overflow-y: auto;"></div>
+</div>
+
+<script src="js/state.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/data/default-data.js"></script>
+<script src="js/data/example-data.js"></script>
+<script src="js/data/example-data-v2.js"></script>
+<script src="js/features/physics.js"></script>
+<script src="js/features/render.js"></script>
+
+<script>
+  // 콘솔 출력 캡처
+  const originalLog = console.log;
+  const originalError = console.error;
+  const consoleLogs = [];
+
+  console.log = function(...args) {
+    originalLog.apply(console, args);
+    consoleLogs.push({ type: 'log', message: args.join(' ') });
+  };
+
+  console.error = function(...args) {
+    originalError.apply(console, args);
+    consoleLogs.push({ type: 'error', message: args.join(' ') });
+  };
+
+  // 테스트 저장소
+  const tests = [];
+
+  function addTest(name, fn) {
+    tests.push({ name, fn, result: null });
+  }
+
+  // Test 정의
+  addTest('① Physics 엔진 로드', () => {
+    return window.I2IPhysics && window.I2IPhysics.PhysicsSimulation ? 'Physics 엔진 로드됨' : 'Physics 엔진 미로드';
+  });
+
+  addTest('② 상태 관리 로드', () => {
+    return window.I2IState ? 'I2IState 로드됨' : 'I2IState 미로드';
+  });
+
+  addTest('③ 유틸리티 함수 로드', () => {
+    return window.I2IUtils && window.I2IUtils.esc && window.I2IUtils.allEntries ? 'I2IUtils 로드됨' : 'I2IUtils 미로드';
+  });
+
+  addTest('④ 데이터 로드', () => {
+    const state = window.I2IState.load();
+    const nodeCount = state.nodes ? state.nodes.length : 0;
+    const relCount = state.relationships ? state.relationships.length : 0;
+    return nodeCount > 0 && relCount > 0 ? `노드 ${nodeCount}개, 관계 ${relCount}개` : '데이터 부족';
+  });
+
+  addTest('⑤ Simulation 인스턴스 생성', () => {
+    try {
+      const state = window.I2IState.load();
+      const nodes = JSON.parse(JSON.stringify(state.nodes.slice(0, 5)));
+      const rels = state.relationships.filter(r => {
+        const s = nodes.find(n => n.id === r.sourceNodeId);
+        const t = nodes.find(n => n.id === r.targetNodeId);
+        return s && t;
+      });
+      const sim = new window.I2IPhysics.PhysicsSimulation(nodes, rels);
+      return sim && sim.nodes.length > 0 ? `Simulation 생성됨 (${sim.nodes.length}노드)` : '생성 실패';
+    } catch(e) {
+      return `오류: ${e.message}`;
+    }
+  });
+
+  addTest('⑥ Physics Tick 실행', () => {
+    try {
+      const state = window.I2IState.load();
+      const nodes = JSON.parse(JSON.stringify(state.nodes.slice(0, 5)));
+      const rels = state.relationships.filter(r => {
+        const s = nodes.find(n => n.id === r.sourceNodeId);
+        const t = nodes.find(n => n.id === r.targetNodeId);
+        return s && t;
+      });
+      const sim = new window.I2IPhysics.PhysicsSimulation(nodes, rels);
+
+      const initialAlpha = sim.alpha;
+      sim.tick();
+      sim.tick();
+      sim.tick();
+
+      const finalAlpha = sim.alpha;
+      const isDecaying = finalAlpha < initialAlpha;
+      return isDecaying ? `Alpha: ${initialAlpha.toFixed(3)} → ${finalAlpha.toFixed(3)}` : 'Alpha 미변화';
+    } catch(e) {
+      return `오류: ${e.message}`;
+    }
+  });
+
+  addTest('⑦ Card Preview 기능', () => {
+    try {
+      const state = window.I2IState.load();
+      const allEntries = window.I2IUtils.allEntries(state);
+      if (allEntries.length === 0) return '다이어리 데이터 없음';
+
+      const entry = allEntries[0];
+      const preview = entry.content.slice(0, 200) + (entry.content.length > 200 ? '…' : '');
+      const isPreviewCorrect = preview.length <= 201 && (entry.content.length > 200 ? preview.endsWith('…') : true);
+      return isPreviewCorrect ? `Preview: "${preview.substring(0, 30)}..." (${preview.length}자)` : 'Preview 생성 실패';
+    } catch(e) {
+      return `오류: ${e.message}`;
+    }
+  });
+
+  addTest('⑧ Timeline Preview 기능', () => {
+    try {
+      const state = window.I2IState.load();
+      const allEntries = window.I2IUtils.allEntries(state);
+      if (allEntries.length === 0) return '다이어리 데이터 없음';
+
+      const entry = allEntries[0];
+      const preview = entry.content.slice(0, 150) + (entry.content.length > 150 ? '…' : '');
+      const isPreviewCorrect = preview.length <= 151 && (entry.content.length > 150 ? preview.endsWith('…') : true);
+      return isPreviewCorrect ? `Preview: "${preview.substring(0, 30)}..." (${preview.length}자)` : 'Preview 생성 실패';
+    } catch(e) {
+      return `오류: ${e.message}`;
+    }
+  });
+
+  addTest('⑨ Render 함수 로드', () => {
+    return window.I2IRender && window.I2IRender.main && window.I2IRender.getMindmapPanel ? 'I2IRender 로드됨' : 'I2IRender 미로드';
+  });
+
+  addTest('⑩ 콘솔 오류 확인', () => {
+    const errors = consoleLogs.filter(log => log.type === 'error');
+    return errors.length === 0 ? '오류 없음' : `${errors.length}개 오류`;
+  });
+
+  // 테스트 실행
+  async function runTests() {
+    const testsContainer = document.getElementById('tests');
+    testsContainer.innerHTML = '';
+
+    for (let i = 0; i < tests.length; i++) {
+      const test = tests[i];
+      try {
+        test.result = test.fn();
+        const isPassed = !test.result.includes('오류') && !test.result.includes('실패') && !test.result.includes('미로드') && !test.result.includes('부족');
+
+        const testEl = document.createElement('div');
+        testEl.className = `test ${isPassed ? 'pass' : 'fail'}`;
+        testEl.innerHTML = `
+          <strong>${test.name}</strong><br>
+          ${isPassed ? '✅' : '❌'} ${test.result}
+        `;
+        testsContainer.appendChild(testEl);
+
+        // Progress bar 업데이트
+        const progress = Math.round((i + 1) / tests.length * 100);
+        document.getElementById('progressBar').style.width = progress + '%';
+        document.getElementById('progressText').textContent = `${i + 1}/${tests.length}`;
+      } catch (e) {
+        const testEl = document.createElement('div');
+        testEl.className = 'test fail';
+        testEl.innerHTML = `
+          <strong>${test.name}</strong><br>
+          ❌ 오류: ${e.message}
+        `;
+        testsContainer.appendChild(testEl);
+      }
+
+      // 비동기로 UI 업데이트
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+
+    // 콘솔 표시
+    if (consoleLogs.some(log => log.type === 'error')) {
+      document.getElementById('console').style.display = 'block';
+      const consoleOutput = document.getElementById('consoleOutput');
+      consoleOutput.innerHTML = consoleLogs
+        .map(log => `<div style="color: ${log.type === 'error' ? '#ff6b6b' : '#00ff00'}">${log.message}</div>`)
+        .join('');
+    }
+
+    // 최종 결과
+    const passedCount = tests.filter(t => !t.result.includes('오류') && !t.result.includes('실패') && !t.result.includes('미로드') && !t.result.includes('부족')).length;
+    const totalCount = tests.length;
+    const finalMessage = `\n\n✅ 검증 완료: ${passedCount}/${totalCount} 항목 통과`;
+    console.log(finalMessage);
+
+    document.getElementById('progressBar').style.width = '100%';
+  }
+
+  // 페이지 로드 후 테스트 실행
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', runTests);
+  } else {
+    runTests();
+  }
+</script>
+</body>
+</html>

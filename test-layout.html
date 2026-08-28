@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📐 Layout 검증</title>
+<link rel="stylesheet" href="css/main.css">
+<style>
+  body { padding: 20px; background: #f5f5f5; }
+  .test-container { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+  h2 { margin-top: 0; color: #2196f3; }
+  button { padding: 10px 20px; margin: 5px; background: #4caf50; color: white; border: none; border-radius: 4px; cursor: pointer; }
+  button:hover { background: #45a049; }
+  .log { background: #f0f0f0; padding: 10px; border-radius: 4px; margin: 10px 0; font-size: 12px; font-family: monospace; max-height: 400px; overflow: auto; }
+  .pass { color: #2e7d32; font-weight: bold; }
+  .fail { color: #c62828; font-weight: bold; }
+  svg { border: 1px solid #ccc; margin-top: 10px; }
+</style>
+</head>
+<body>
+<h1>📐 Layout 검증</h1>
+
+<div class="test-container">
+  <h2>1️⃣ 계층 기반 Layout 테스트</h2>
+  <button onclick="testRadialLayout()">Radial Layout 테스트</button>
+  <div id="log1" class="log">대기 중...</div>
+  <svg id="canvas1" width="600" height="400" style="border: 1px solid #2196f3;"></svg>
+</div>
+
+<div class="test-container">
+  <h2>2️⃣ Node Scale 계산 테스트</h2>
+  <button onclick="testNodeScale()">Scale 계산 테스트</button>
+  <div id="log2" class="log">대기 중...</div>
+</div>
+
+<div class="test-container">
+  <h2>3️⃣ 겹침 방지 테스트</h2>
+  <button onclick="testCollisionResolution()">겹침 방지 테스트</button>
+  <div id="log3" class="log">대기 중...</div>
+  <svg id="canvas3" width="600" height="400" style="border: 1px solid #2196f3;"></svg>
+</div>
+
+<script src="js/state.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/features/layout.js"></script>
+
+<script>
+function log(elementId, msg, isPass = null) {
+  const el = document.getElementById(elementId);
+  const className = isPass === true ? 'pass' : isPass === false ? 'fail' : '';
+  el.innerHTML += `<div class="${className}">${msg}</div>`;
+  el.scrollTop = el.scrollHeight;
+}
+
+function testRadialLayout() {
+  document.getElementById('log1').innerHTML = '';
+  log('log1', '=== 계층 기반 Layout 테스트 ===');
+
+  try {
+    if (!window.I2ILayout) {
+      log('log1', '❌ I2ILayout 로드 실패', false);
+      return;
+    }
+
+    // 테스트 그래프: 트리 구조
+    const nodes = [
+      { id: 'root', position: { x: 0, y: 0 } },
+      { id: 'child1', position: { x: 0, y: 0 } },
+      { id: 'child2', position: { x: 0, y: 0 } },
+      { id: 'child3', position: { x: 0, y: 0 } },
+      { id: 'grandchild1', position: { x: 0, y: 0 } },
+      { id: 'grandchild2', position: { x: 0, y: 0 } },
+    ];
+
+    const rels = [
+      { type: 'parent', sourceNodeId: 'root', targetNodeId: 'child1' },
+      { type: 'parent', sourceNodeId: 'root', targetNodeId: 'child2' },
+      { type: 'parent', sourceNodeId: 'root', targetNodeId: 'child3' },
+      { type: 'parent', sourceNodeId: 'child1', targetNodeId: 'grandchild1' },
+      { type: 'parent', sourceNodeId: 'child2', targetNodeId: 'grandchild2' },
+    ];
+
+    log('log1', `✓ 테스트 노드: ${nodes.length}개`);
+    log('log1', `✓ 관계: ${rels.length}개`);
+
+    // Layout 계산
+    const layerMap = window.I2ILayout.buildLayerMap(nodes, rels);
+    log('log1', `✓ Layer 분석 완료`);
+
+    const positioned = window.I2ILayout.layoutRadial(nodes, rels);
+    log('log1', `✓ Radial Layout 계산 완료`);
+
+    // Layer 검증
+    const rootLayer = layerMap['root'];
+    const childLayers = [layerMap['child1'], layerMap['child2'], layerMap['child3']];
+    const grandchildLayers = [layerMap['grandchild1'], layerMap['grandchild2']];
+
+    log('log1', `Root Layer: ${rootLayer}`, rootLayer === 1);
+    log('log1', `Child Layers: [${childLayers.join(',')}]`, childLayers.every(l => l === 2));
+    log('log1', `Grandchild Layers: [${grandchildLayers.join(',')}]`, grandchildLayers.every(l => l === 3));
+
+    // 위치 검증
+    let noCollision = true;
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const posA = positioned[i].position;
+        const posB = positioned[j].position;
+        const dist = Math.sqrt((posA.x - posB.x) ** 2 + (posA.y - posB.y) ** 2);
+        if (dist < 70) noCollision = false;
+      }
+    }
+
+    log('log1', `✓ 노드 겹침 없음`, noCollision);
+
+    // 중앙 거리 확인
+    const centerX = 450, centerY = 285;
+    const distRoot = Math.sqrt(
+      (positioned[0].position.x - centerX) ** 2 +
+      (positioned[0].position.y - centerY) ** 2
+    );
+    const distChild1 = Math.sqrt(
+      (positioned[1].position.x - centerX) ** 2 +
+      (positioned[1].position.y - centerY) ** 2
+    );
+
+    log('log1', `Root 중앙 거리: ${distRoot.toFixed(1)}px`);
+    log('log1', `Child1 중앙 거리: ${distChild1.toFixed(1)}px`);
+    log('log1', `✓ Root가 중앙에 더 가까움`, distRoot < distChild1);
+
+    if (noCollision && distRoot < distChild1) {
+      log('log1', `✅ Layout 정상 작동!`, true);
+    } else {
+      log('log1', `❌ 문제 발견`, false);
+    }
+
+    // Canvas 그리기
+    drawLayout(document.getElementById('canvas1'), positioned, 'root');
+
+  } catch (e) {
+    log('log1', `❌ 오류: ${e.message}`, false);
+    console.error(e.stack);
+  }
+}
+
+function testNodeScale() {
+  document.getElementById('log2').innerHTML = '';
+  log('log2', '=== Node Scale 계산 테스트 ===');
+
+  try {
+    // 적은 노드
+    const fewNodes = [
+      { id: 'a', position: { x: 450, y: 285 } },
+      { id: 'b', position: { x: 500, y: 285 } },
+      { id: 'c', position: { x: 550, y: 285 } },
+    ];
+
+    const fewScale = window.I2ILayout.calculateNodeScale(fewNodes);
+    log('log2', `✓ 노드 3개: Scale=${fewScale.toFixed(2)}`, fewScale >= 0.9);
+
+    // 많은 노드 (원형 배치)
+    const manyNodes = [];
+    const count = 30;
+    for (let i = 0; i < count; i++) {
+      const angle = (i / count) * Math.PI * 2;
+      manyNodes.push({
+        id: `node${i}`,
+        position: {
+          x: 450 + Math.cos(angle) * 300,
+          y: 285 + Math.sin(angle) * 300
+        }
+      });
+    }
+
+    const manyScale = window.I2ILayout.calculateNodeScale(manyNodes);
+    log('log2', `✓ 노드 ${count}개: Scale=${manyScale.toFixed(2)}`, manyScale < 1 && manyScale >= 0.5);
+
+    if (fewScale >= 0.9 && manyScale < 1) {
+      log('log2', `✅ Scale 계산 정상!`, true);
+    } else {
+      log('log2', `❌ Scale 계산 이상`, false);
+    }
+
+  } catch (e) {
+    log('log2', `❌ 오류: ${e.message}`, false);
+  }
+}
+
+function testCollisionResolution() {
+  document.getElementById('log3').innerHTML = '';
+  log('log3', '=== 겹침 방지 테스트 ===');
+
+  try {
+    // 겹친 노드들
+    const nodes = [
+      { id: 'a', position: { x: 300, y: 200 } },
+      { id: 'b', position: { x: 320, y: 200 } }, // 매우 가까움
+      { id: 'c', position: { x: 310, y: 220 } },
+      { id: 'd', position: { x: 330, y: 220 } },
+    ];
+
+    const rels = [];
+
+    log('log3', `✓ 겹친 노드 4개 생성`);
+
+    const positioned = window.I2ILayout.layoutRadial(nodes, rels);
+
+    // 겹침 확인
+    let maxCollision = 0;
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const posA = positioned[i].position;
+        const posB = positioned[j].position;
+        const dist = Math.sqrt((posA.x - posB.x) ** 2 + (posA.y - posB.y) ** 2);
+        const minDist = 64 + 20; // nodeRadius * 2 + minGap
+        if (dist < minDist) {
+          maxCollision = Math.max(maxCollision, minDist - dist);
+        }
+      }
+    }
+
+    log('log3', `✓ 최대 겹침 거리: ${maxCollision.toFixed(1)}px`);
+    log('log3', `✓ 겹침 없음`, maxCollision === 0, maxCollision === 0);
+
+    if (maxCollision === 0) {
+      log('log3', `✅ 겹침 방지 정상 작동!`, true);
+    } else {
+      log('log3', `⚠️ 미세한 겹침 존재 (허용치 범위)`, maxCollision < 5);
+    }
+
+    // Canvas 그리기
+    drawLayout(document.getElementById('canvas3'), positioned, null);
+
+  } catch (e) {
+    log('log3', `❌ 오류: ${e.message}`, false);
+  }
+}
+
+function drawLayout(canvas, nodes, rootId) {
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // 스케일 계산
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  nodes.forEach(n => {
+    minX = Math.min(minX, n.position.x);
+    maxX = Math.max(maxX, n.position.x);
+    minY = Math.min(minY, n.position.y);
+    maxY = Math.max(maxY, n.position.y);
+  });
+
+  const padding = 20;
+  const scaleX = (canvas.width - padding * 2) / (maxX - minX + 1);
+  const scaleY = (canvas.height - padding * 2) / (maxY - minY + 1);
+  const scale = Math.min(scaleX, scaleY);
+
+  const screenX = (x) => (x - minX) * scale + padding;
+  const screenY = (y) => (y - minY) * scale + padding;
+
+  // 노드 그리기
+  nodes.forEach(n => {
+    const x = screenX(n.position.x);
+    const y = screenY(n.position.y);
+    const radius = 8;
+
+    // 배경
+    ctx.fillStyle = rootId === n.id ? '#ff6f00' : '#42a5f5';
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 테두리
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  });
+
+  // 중앙 표시
+  ctx.fillStyle = '#ff0000';
+  ctx.beginPath();
+  ctx.arc(padding, padding, 3, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+window.addEventListener('load', () => {
+  log('log1', '페이지 로드 완료');
+  log('log2', '준비 완료');
+  log('log3', '준비 완료');
+});
+</script>
+</body>
+</html>

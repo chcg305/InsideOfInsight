@@ -1,7 +1,7 @@
-window.EXAMPLE_DATA = {
+window.DEFAULT_DATA = {
   "nodes": [
     {
-      "id": "root-나",
+      "id": "root-me",
       "categoryId": "",
       "name": "나",
       "position": {
@@ -13,7 +13,7 @@ window.EXAMPLE_DATA = {
       "label": ""
     },
     {
-      "id": "layer2-가족",
+      "id": "family",
       "categoryId": "",
       "name": "가족",
       "position": {
@@ -25,7 +25,7 @@ window.EXAMPLE_DATA = {
       "label": ""
     },
     {
-      "id": "layer2-학업",
+      "id": "education",
       "categoryId": "",
       "name": "학업",
       "position": {
@@ -37,7 +37,7 @@ window.EXAMPLE_DATA = {
       "label": ""
     },
     {
-      "id": "layer2-커리어",
+      "id": "career",
       "categoryId": "",
       "name": "커리어",
       "position": {
@@ -49,7 +49,7 @@ window.EXAMPLE_DATA = {
       "label": ""
     },
     {
-      "id": "layer2-친구",
+      "id": "friends",
       "categoryId": "",
       "name": "친구",
       "position": {
@@ -61,7 +61,7 @@ window.EXAMPLE_DATA = {
       "label": ""
     },
     {
-      "id": "layer3-부모",
+      "id": "parents",
       "categoryId": "",
       "name": "부모",
       "position": {
@@ -73,7 +73,7 @@ window.EXAMPLE_DATA = {
       "label": ""
     },
     {
-      "id": "layer3-형제",
+      "id": "siblings",
       "categoryId": "",
       "name": "형제",
       "position": {
@@ -85,7 +85,7 @@ window.EXAMPLE_DATA = {
       "label": ""
     },
     {
-      "id": "layer3-전공",
+      "id": "major",
       "categoryId": "",
       "name": "전공",
       "position": {
@@ -97,7 +97,7 @@ window.EXAMPLE_DATA = {
       "label": ""
     },
     {
-      "id": "layer3-교과",
+      "id": "courses",
       "categoryId": "",
       "name": "교과",
       "position": {
@@ -109,7 +109,7 @@ window.EXAMPLE_DATA = {
       "label": ""
     },
     {
-      "id": "layer3-취업",
+      "id": "job",
       "categoryId": "",
       "name": "취업",
       "position": {
@@ -121,7 +121,7 @@ window.EXAMPLE_DATA = {
       "label": ""
     },
     {
-      "id": "layer3-인턴",
+      "id": "internship",
       "categoryId": "",
       "name": "인턴",
       "position": {
@@ -133,7 +133,7 @@ window.EXAMPLE_DATA = {
       "label": ""
     },
     {
-      "id": "layer4-아버지",
+      "id": "father",
       "categoryId": "",
       "name": "아버지",
       "position": {
@@ -145,7 +145,7 @@ window.EXAMPLE_DATA = {
       "label": ""
     },
     {
-      "id": "layer4-어머니",
+      "id": "mother",
       "categoryId": "",
       "name": "어머니",
       "position": {
@@ -157,7 +157,7 @@ window.EXAMPLE_DATA = {
       "label": ""
     },
     {
-      "id": "layer4-누나",
+      "id": "sister",
       "categoryId": "",
       "name": "누나",
       "position": {
@@ -169,7 +169,7 @@ window.EXAMPLE_DATA = {
       "label": ""
     },
     {
-      "id": "layer4-프로젝트",
+      "id": "project",
       "categoryId": "",
       "name": "프로젝트",
       "position": {
@@ -181,7 +181,7 @@ window.EXAMPLE_DATA = {
       "label": ""
     },
     {
-      "id": "layer4-알고리즘",
+      "id": "algorithm",
       "categoryId": "",
       "name": "알고리즘",
       "position": {
@@ -193,7 +193,7 @@ window.EXAMPLE_DATA = {
       "label": ""
     },
     {
-      "id": "layer4-포트폴리오",
+      "id": "portfolio",
       "categoryId": "",
       "name": "포트폴리오",
       "position": {
@@ -205,7 +205,7 @@ window.EXAMPLE_DATA = {
       "label": ""
     },
     {
-      "id": "layer4-회사",
+      "id": "company",
       "categoryId": "",
       "name": "회사",
       "position": {
@@ -217,7 +217,7 @@ window.EXAMPLE_DATA = {
       "label": ""
     },
     {
-      "id": "layer5-아버지취업",
+      "id": "father-career",
       "categoryId": "",
       "name": "아버지 커리어",
       "position": {
@@ -229,7 +229,7 @@ window.EXAMPLE_DATA = {
       "label": ""
     },
     {
-      "id": "layer5-어머니양육",
+      "id": "mother-parenting",
       "categoryId": "",
       "name": "어머니 양육",
       "position": {
@@ -241,7 +241,7 @@ window.EXAMPLE_DATA = {
       "label": ""
     },
     {
-      "id": "layer5-데이터분석",
+      "id": "data-analysis",
       "categoryId": "",
       "name": "데이터 분석",
       "position": {
@@ -253,7 +253,7 @@ window.EXAMPLE_DATA = {
       "label": ""
     },
     {
-      "id": "layer5-웹개발",
+      "id": "web-dev",
       "categoryId": "",
       "name": "웹 개발",
       "position": {
@@ -265,7 +265,7 @@ window.EXAMPLE_DATA = {
       "label": ""
     },
     {
-      "id": "layer5-포트폴리오상세",
+      "id": "portfolio-site",
       "categoryId": "",
       "name": "포트폴리오 사이트",
       "position": {
@@ -277,7 +277,7 @@ window.EXAMPLE_DATA = {
       "label": ""
     },
     {
-      "id": "layer5-인턴심면",
+      "id": "interview",
       "categoryId": "",
       "name": "인턴 면접",
       "position": {
@@ -292,176 +292,176 @@ window.EXAMPLE_DATA = {
   "relationships": [
     {
       "id": "rel-1",
-      "sourceNodeId": "root-나",
-      "targetNodeId": "layer2-가족",
+      "sourceNodeId": "root-me",
+      "targetNodeId": "family",
       "type": "parent",
       "label": ""
     },
     {
       "id": "rel-2",
-      "sourceNodeId": "root-나",
-      "targetNodeId": "layer2-학업",
+      "sourceNodeId": "root-me",
+      "targetNodeId": "education",
       "type": "parent",
       "label": ""
     },
     {
       "id": "rel-3",
-      "sourceNodeId": "root-나",
-      "targetNodeId": "layer2-커리어",
+      "sourceNodeId": "root-me",
+      "targetNodeId": "career",
       "type": "parent",
       "label": ""
     },
     {
       "id": "rel-4",
-      "sourceNodeId": "root-나",
-      "targetNodeId": "layer2-친구",
+      "sourceNodeId": "root-me",
+      "targetNodeId": "friends",
       "type": "parent",
       "label": ""
     },
     {
       "id": "rel-5",
-      "sourceNodeId": "layer2-가족",
-      "targetNodeId": "layer3-부모",
+      "sourceNodeId": "family",
+      "targetNodeId": "parents",
       "type": "parent",
       "label": ""
     },
     {
       "id": "rel-6",
-      "sourceNodeId": "layer2-가족",
-      "targetNodeId": "layer3-형제",
+      "sourceNodeId": "family",
+      "targetNodeId": "siblings",
       "type": "parent",
       "label": ""
     },
     {
       "id": "rel-7",
-      "sourceNodeId": "layer3-부모",
-      "targetNodeId": "layer4-아버지",
+      "sourceNodeId": "parents",
+      "targetNodeId": "father",
       "type": "parent",
       "label": ""
     },
     {
       "id": "rel-8",
-      "sourceNodeId": "layer3-부모",
-      "targetNodeId": "layer4-어머니",
+      "sourceNodeId": "parents",
+      "targetNodeId": "mother",
       "type": "parent",
       "label": ""
     },
     {
       "id": "rel-9",
-      "sourceNodeId": "layer3-형제",
-      "targetNodeId": "layer4-누나",
+      "sourceNodeId": "siblings",
+      "targetNodeId": "sister",
       "type": "parent",
       "label": ""
     },
     {
       "id": "rel-10",
-      "sourceNodeId": "layer4-아버지",
-      "targetNodeId": "layer5-아버지취업",
+      "sourceNodeId": "father",
+      "targetNodeId": "father-career",
       "type": "parent",
       "label": ""
     },
     {
       "id": "rel-11",
-      "sourceNodeId": "layer4-어머니",
-      "targetNodeId": "layer5-어머니양육",
+      "sourceNodeId": "mother",
+      "targetNodeId": "mother-parenting",
       "type": "parent",
       "label": ""
     },
     {
       "id": "rel-12",
-      "sourceNodeId": "layer2-학업",
-      "targetNodeId": "layer3-전공",
+      "sourceNodeId": "education",
+      "targetNodeId": "major",
       "type": "parent",
       "label": ""
     },
     {
       "id": "rel-13",
-      "sourceNodeId": "layer2-학업",
-      "targetNodeId": "layer3-교과",
+      "sourceNodeId": "education",
+      "targetNodeId": "courses",
       "type": "parent",
       "label": ""
     },
     {
       "id": "rel-14",
-      "sourceNodeId": "layer3-전공",
-      "targetNodeId": "layer4-프로젝트",
+      "sourceNodeId": "major",
+      "targetNodeId": "project",
       "type": "parent",
       "label": ""
     },
     {
       "id": "rel-15",
-      "sourceNodeId": "layer3-교과",
-      "targetNodeId": "layer4-알고리즘",
+      "sourceNodeId": "courses",
+      "targetNodeId": "algorithm",
       "type": "parent",
       "label": ""
     },
     {
       "id": "rel-16",
-      "sourceNodeId": "layer4-프로젝트",
-      "targetNodeId": "layer5-데이터분석",
+      "sourceNodeId": "project",
+      "targetNodeId": "data-analysis",
       "type": "parent",
       "label": ""
     },
     {
       "id": "rel-17",
-      "sourceNodeId": "layer4-알고리즘",
-      "targetNodeId": "layer5-웹개발",
+      "sourceNodeId": "project",
+      "targetNodeId": "web-dev",
       "type": "parent",
       "label": ""
     },
     {
       "id": "rel-18",
-      "sourceNodeId": "layer2-커리어",
-      "targetNodeId": "layer3-취업",
+      "sourceNodeId": "career",
+      "targetNodeId": "job",
       "type": "parent",
       "label": ""
     },
     {
       "id": "rel-19",
-      "sourceNodeId": "layer2-커리어",
-      "targetNodeId": "layer3-인턴",
+      "sourceNodeId": "career",
+      "targetNodeId": "internship",
       "type": "parent",
       "label": ""
     },
     {
       "id": "rel-20",
-      "sourceNodeId": "layer3-취업",
-      "targetNodeId": "layer4-포트폴리오",
+      "sourceNodeId": "job",
+      "targetNodeId": "portfolio",
       "type": "parent",
       "label": ""
     },
     {
       "id": "rel-21",
-      "sourceNodeId": "layer3-인턴",
-      "targetNodeId": "layer4-회사",
+      "sourceNodeId": "internship",
+      "targetNodeId": "company",
       "type": "parent",
       "label": ""
     },
     {
       "id": "rel-22",
-      "sourceNodeId": "layer4-포트폴리오",
-      "targetNodeId": "layer5-포트폴리오상세",
+      "sourceNodeId": "portfolio",
+      "targetNodeId": "portfolio-site",
       "type": "parent",
       "label": ""
     },
     {
       "id": "rel-23",
-      "sourceNodeId": "layer4-회사",
-      "targetNodeId": "layer5-인턴심면",
+      "sourceNodeId": "company",
+      "targetNodeId": "interview",
       "type": "parent",
       "label": ""
     },
     {
       "id": "rel-24",
-      "sourceNodeId": "layer4-아버지",
-      "targetNodeId": "layer4-어머니",
+      "sourceNodeId": "father",
+      "targetNodeId": "mother",
       "type": "friend",
       "label": "부부"
     },
     {
       "id": "rel-25",
-      "sourceNodeId": "layer5-데이터분석",
-      "targetNodeId": "layer5-웹개발",
+      "sourceNodeId": "data-analysis",
+      "targetNodeId": "web-dev",
       "type": "related",
       "label": "협력"
     }
@@ -485,20 +485,11 @@ window.EXAMPLE_DATA = {
         "content": "포트폴리오를 정리하면서 지난 2년을 되돌아봤다. 프로젝트, 알고리즘 공부, 인턴 경험까지 생각보다 많은 것을 했다는 걸 깨달았다. 하지만 아직도 부족한 게 많이 느껴진다. 아버지는 항상 꾸준함이 가장 중요하다고 하셨다. 그 말씀이 요즘 가장 위로가 된다.",
         "date": "2026-08-20T15:30:00",
         "createdAt": "2026-08-20T15:30:00"
-      },
-      {
-        "id": "d3",
-        "category": "나",
-        "title": "친구들과의 대화",
-        "label": "관계",
-        "content": "같은 학과 친구들을 만났다. 우리는 모두 취업 준비를 하면서 각자의 길을 선택하려고 한다. 누나는 이미 회사에 다니고 있고, 나는 인턴을 시작하려고 한다. 친구들의 다양한 선택지를 보면서 나도 더 용감해져야겠다는 생각이 든다.",
-        "date": "2026-08-15T19:00:00",
-        "createdAt": "2026-08-15T19:00:00"
       }
     ],
     "가족": [
       {
-        "id": "d4",
+        "id": "d3",
         "category": "가족",
         "title": "부모님과의 대화",
         "label": "부모님",
@@ -507,114 +498,51 @@ window.EXAMPLE_DATA = {
         "createdAt": "2026-08-20T14:30:00"
       },
       {
-        "id": "d5",
+        "id": "d4",
         "category": "가족",
-        "title": "가족 모임",
-        "label": "모임",
-        "content": "주말에 가족 모두가 함께 모였다. 오랜만에 누나도 시간을 내줬고, 부모님도 한 주간의 피로를 풀면서 우리들 이야기를 들으셨다. 아버지의 젊은 시절 이야기, 어머니의 양육 경험, 누나의 회사 생활 이야기를 들으면서 우리 가족의 역사를 느낀다.",
-        "date": "2026-08-22T18:00:00",
-        "createdAt": "2026-08-22T18:00:00"
-      },
-      {
-        "id": "d6",
-        "category": "가족",
-        "title": "부모님의 조언",
-        "label": "조언",
-        "content": "어머니는 항상 내 건강을 챙기신다. 최근 피로를 잘 풀고 충분히 쉬라고 말씀하셨다. 아버지는 일과 삶의 균형이 얼마나 중요한지 설명해주셨다. 내가 지금 경험하는 압력들이 모두 정상적인 성장 과정이라고 위로해주셨다.",
-        "date": "2026-08-18T20:00:00",
-        "createdAt": "2026-08-18T20:00:00"
+        "title": "형제와의 시간",
+        "label": "형제",
+        "content": "누나와 함께 영화를 봤다. 오랜만에 누나와 함께한 시간을 보냈다. 누나는 내 고민을 들어주고 조언해주는 사람이다. 누나는 이미 회사에서 일하고 있기 때문에 내가 경험해보지 못한 현실을 말해주곤 한다.",
+        "date": "2026-08-15T19:00:00",
+        "createdAt": "2026-08-15T19:00:00"
       }
     ],
     "부모": [
       {
-        "id": "d7",
+        "id": "d5",
         "category": "부모",
         "title": "부모님의 선택",
         "label": "직업",
         "content": "부모님은 자신의 커리어 선택에 대해 깊이 있게 이야기해주셨다. 젊은 시절에 내린 각 결정이 오늘의 삶으로 이어졌다고 하신다. 아버지의 취업 경로와 어머니의 양육 선택이 완전히 다르지만, 둘 다 본인의 선택에 만족해하신다.",
         "date": "2026-08-10T09:00:00",
         "createdAt": "2026-08-10T09:00:00"
-      },
-      {
-        "id": "d8",
-        "category": "부모",
-        "title": "부모님의 관계",
-        "label": "부부",
-        "content": "부모님의 관계를 보면서 좋은 파트너십의 중요성을 깨닫는다. 아버지와 어머니는 자신의 일과 책임을 다하면서도 서로를 지지해주신다. 특히 어머니가 양육에 집중했을 때 아버지가 어떻게 지원했는지 듣는 것이 좋다.",
-        "date": "2026-08-12T15:30:00",
-        "createdAt": "2026-08-12T15:30:00"
       }
     ],
     "아버지": [
       {
-        "id": "d9",
+        "id": "d6",
         "category": "아버지",
         "title": "아버지와의 취업 상담",
         "label": "취업",
         "content": "아버지와 처음으로 진로에 대해 깊이 있게 이야기했다. 아버지는 내가 좋아하는 일을 하는 것이 가장 중요하다고 말씀하셨다. 본인도 여러 직업을 고려했지만, 최종적으로 현재의 일을 선택했을 때 만족감이 달랐다고 하신다. 그 말씀이 내게 큰 위로가 되었다.",
         "date": "2026-08-05T17:00:00",
         "createdAt": "2026-08-05T17:00:00"
-      },
-      {
-        "id": "d10",
-        "category": "아버지",
-        "title": "아버지의 커리어 경험",
-        "label": "직업",
-        "content": "아버지는 본인의 첫 회사에서 배운 것이 인생에 큰 영향을 미쳤다고 하신다. 처음의 실패와 배움이 있었기에 지금의 자리에 올 수 있었다고 하신다. 특히 상사의 피드백을 어떻게 받아들였는지, 실수에서 어떻게 배웠는지에 대한 이야기가 인상적이다.",
-        "date": "2026-08-08T14:30:00",
-        "createdAt": "2026-08-08T14:30:00"
-      },
-      {
-        "id": "d11",
-        "category": "아버지",
-        "title": "아버지의 조언",
-        "label": "조언",
-        "content": "아버지는 나에게 '실패를 두려워하지 말고, 배움의 기회로 생각하라'는 말씀을 자주 하신다. 본인도 젊을 때 많은 실패를 경험했지만, 그것이 가장 큰 자산이 되었다고 하신다. 인턴 면접을 앞두고 이 말씀이 정말 위로가 된다.",
-        "date": "2026-08-03T10:00:00",
-        "createdAt": "2026-08-03T10:00:00"
       }
     ],
     "어머니": [
       {
-        "id": "d12",
+        "id": "d7",
         "category": "어머니",
         "title": "어머니의 조언",
         "label": "건강",
-        "content": "어머니는 항상 내 건강을 챙기신다. 최근 피로가 보인다고 하시면서 충분히 쉬라고 말씀하신다. 어머니는 나의 정신적, 신체적 건강이 가장 중요하다고 생각하신다. 특히 인턴 준비로 바쁠 때일수록 규칙적인 생활과 충분한 수면의 중요성을 강조하신다.",
+        "content": "어머니는 항상 내 건강을 챙기신다. 최근 피로를 잘 풀고 충분히 쉬라고 말씀하셨다. 어머니는 나의 정신적, 신체적 건강이 가장 중요하다고 생각하신다. 인턴 준비로 바쁠 때일수록 규칙적인 생활과 충분한 수면의 중요성을 강조하신다.",
         "date": "2026-08-08T20:00:00",
         "createdAt": "2026-08-08T20:00:00"
-      },
-      {
-        "id": "d13",
-        "category": "어머니",
-        "title": "어머니의 양육 철학",
-        "label": "양육",
-        "content": "어머니는 본인의 양육 선택에 대해 이야기해주셨다. 직업을 잠깐 멈추고 우리를 키우기로 한 결정이 어떤 의미였는지, 그리고 지금 그 시간을 어떻게 평가하는지 들어본다. 어머니는 그 시간이 후회 없다고 하신다. 다만 여성으로서의 자기 개발도 중요하다고 강조하신다.",
-        "date": "2026-08-06T18:00:00",
-        "createdAt": "2026-08-06T18:00:00"
-      },
-      {
-        "id": "d14",
-        "category": "어머니",
-        "title": "어머니의 응원",
-        "label": "격려",
-        "content": "어머니는 내가 하는 모든 노력을 눈여겨보신다. 프로젝트를 하고, 알고리즘을 공부하고, 인턴을 준비하는 모든 과정을 응원해주신다. 특히 실패하거나 낙담할 때 어머니의 말 한마디가 다시 일어날 힘을 준다. 그래서 나는 어머니께 특별한 고마움을 느낀다.",
-        "date": "2026-08-02T15:00:00",
-        "createdAt": "2026-08-02T15:00:00"
       }
     ],
     "형제": [
       {
-        "id": "d15",
-        "category": "형제",
-        "title": "누나와의 시간",
-        "label": "우정",
-        "content": "누나와 함께 영화를 봤다. 오랜만에 누나 없이는 상상도 할 수 없는 시간을 보냈다. 누나는 내 고민을 들어주고 조언해주는 사람이다. 누나는 이미 회사에서 일하고 있기 때문에 내가 경험해보지 못한 현실을 말해주곤 한다.",
-        "date": "2026-08-15T19:00:00",
-        "createdAt": "2026-08-15T19:00:00"
-      },
-      {
-        "id": "d16",
+        "id": "d8",
         "category": "형제",
         "title": "누나의 조언",
         "label": "커리어",
@@ -625,87 +553,51 @@ window.EXAMPLE_DATA = {
     ],
     "학업": [
       {
-        "id": "d17",
+        "id": "d9",
         "category": "학업",
         "title": "공부의 방향성",
         "label": "학업 계획",
         "content": "이번 학기 동안 배운 것들이 정말 많다. 특히 프로젝트와 알고리즘을 통해 실제로 문제를 해결하는 경험을 했다. 이 경험들이 나의 진로를 결정하는 데 도움이 될 것 같다. 더 체계적으로 공부해야 할 부분들도 보인다.",
         "date": "2026-08-18T11:00:00",
         "createdAt": "2026-08-18T11:00:00"
-      },
-      {
-        "id": "d18",
-        "category": "학업",
-        "title": "학습 경험",
-        "label": "기술",
-        "content": "전공 과목들을 공부하면서 이론과 실습의 연결고리를 찾기 시작했다. 특히 알고리즘과 데이터 구조를 이해했을 때 문제 해결 능력이 크게 향상되었다. 이제 그 지식들을 실제 프로젝트에 적용하고 싶다.",
-        "date": "2026-08-12T14:00:00",
-        "createdAt": "2026-08-12T14:00:00"
       }
     ],
     "전공": [
       {
-        "id": "d19",
+        "id": "d10",
         "category": "전공",
         "title": "전공에 대한 고민",
         "label": "진로",
         "content": "컴퓨터 공학을 공부하면서 정말 다양한 분야가 있다는 것을 알았다. 백엔드, 프론트엔드, 데이터 엔지니어링, AI 등 많은 길이 있다. 어떤 길을 선택할지는 여전히 고민 중이다. 프로젝트를 하면서 각 분야를 조금씩 경험해보고 싶다.",
         "date": "2026-08-12T15:30:00",
         "createdAt": "2026-08-12T15:30:00"
-      },
-      {
-        "id": "d20",
-        "category": "전공",
-        "title": "전공 선택의 의미",
-        "label": "선택",
-        "content": "나는 데이터 분석과 웹 개발 중에 고민 중이다. 아버지는 두 분야 모두 전망이 좋다고 하시고, 누나는 개발자로서의 경험을 나눠준다. 최종적으로는 내가 흥미 있어 하는 분야를 선택하는 것이 맞다는 조언을 받았다.",
-        "date": "2026-08-08T10:00:00",
-        "createdAt": "2026-08-08T10:00:00"
       }
     ],
     "프로젝트": [
       {
-        "id": "d21",
+        "id": "d11",
         "category": "프로젝트",
         "title": "데이터 분석 프로젝트",
         "label": "데이터 분석",
         "content": "지난 2개월간의 프로젝트가 드디어 완료되었다. 데이터 수집부터 시각화까지 전 과정을 경험했다. 처음에는 막막했지만, 단계별로 문제를 해결하면서 성취감을 느꼈다. 이 경험이 앞으로의 취업에 큰 도움이 될 것 같다.",
         "date": "2026-08-22T18:00:00",
         "createdAt": "2026-08-22T18:00:00"
-      },
-      {
-        "id": "d22",
-        "category": "프로젝트",
-        "title": "프로젝트 회고",
-        "label": "성찰",
-        "content": "프로젝트를 마치고 회고해본다. 팀과 함께 일하면서 배운 점들이 많다. 특히 효율적인 커뮤니케이션의 중요성을 느꼈다. 데이터 분석 기술도 배웠지만, 함께 일하는 방법도 배웠다.",
-        "date": "2026-08-24T17:00:00",
-        "createdAt": "2026-08-24T17:00:00"
       }
     ],
     "알고리즘": [
       {
-        "id": "d23",
+        "id": "d12",
         "category": "알고리즘",
         "title": "알고리즘 공부",
         "label": "기술",
-        "content": "알고리즘 공부를 꾸준히 하고 있다. 처음에는 어렵고 이해가 잘 안 됐지만, 반복 학습을 통해 점점 나아지고 있다. 특히 그래프 문제들을 풀 때 활용할 수 있는 다양한 기법들을 배웠다.",
+        "content": "알고리즘 공부를 꾸준히 하고 있다. 처음에는 어렵고 이해가 잘 안 됐지만, 반복 학습을 통해 점점 나아지고 있다. 특히 그래프 문제들을 풀 때 활용할 수 있는 다양한 기법들을 배웠다. 웹 개발을 할 때도 효율적인 알고리즘을 선택하는 것이 성능에 큰 영향을 미친다.",
         "date": "2026-08-20T16:00:00",
         "createdAt": "2026-08-20T16:00:00"
-      },
-      {
-        "id": "d24",
-        "category": "알고리즘",
-        "title": "알고리즘의 실용성",
-        "label": "활용",
-        "content": "알고리즘을 공부하면서 이론이 얼마나 중요한지 깨달았다. 웹 개발을 할 때도 효율적인 알고리즘을 선택하는 것이 성능에 큰 영향을 미친다. 앞으로 더 깊이 있게 공부하고 싶다.",
-        "date": "2026-08-16T14:30:00",
-        "createdAt": "2026-08-16T14:30:00"
       }
     ],
     "교과": [
       {
-        "id": "d25",
+        "id": "d13",
         "category": "교과",
         "title": "교과 이수",
         "label": "학습",
@@ -716,107 +608,62 @@ window.EXAMPLE_DATA = {
     ],
     "커리어": [
       {
-        "id": "d26",
+        "id": "d14",
         "category": "커리어",
         "title": "진로 선택의 고민",
         "label": "진로",
         "content": "백엔드 개발자가 될지, 데이터 엔지니어가 될지 고민이 많다. 둘 다 흥미로운 분야이지만, 실제로 일해보지 않으면 어느 쪽이 더 맞는지 알 수 없다. 인턴을 통해 경험을 쌓아보고 싶다.",
         "date": "2026-08-24T16:45:00",
         "createdAt": "2026-08-24T16:45:00"
-      },
-      {
-        "id": "d27",
-        "category": "커리어",
-        "title": "커리어 계획",
-        "label": "계획",
-        "content": "5년 후, 10년 후의 내 모습을 상상해본다. 지금의 선택이 미래의 길을 결정할 것이다. 따라서 현재의 인턴, 첫 직장이 매우 중요하다. 아버지의 경험담과 누나의 조언을 바탕으로 신중하게 선택하고 싶다.",
-        "date": "2026-08-19T18:00:00",
-        "createdAt": "2026-08-19T18:00:00"
       }
     ],
     "취업": [
       {
-        "id": "d28",
+        "id": "d15",
         "category": "취업",
         "title": "첫 취업 면접",
         "label": "면접",
         "content": "오늘 첫 회사 면접을 봤다. 긴장했지만 최선을 다했다. 면접관은 내 프로젝트 경험에 대해 많은 질문을 하셨다. 특히 데이터 분석 프로젝트의 기술적 선택을 설명하는 과정에서 배운 것들이 큰 도움이 되었다.",
         "date": "2026-08-26T14:00:00",
         "createdAt": "2026-08-26T14:00:00"
-      },
-      {
-        "id": "d29",
-        "category": "취업",
-        "title": "포트폴리오와 면접",
-        "label": "준비",
-        "content": "포트폴리오를 완성하고 나니 면접이 훨씬 수월했다. 내 경험을 체계적으로 정리했기 때문에 인터뷰 과정에서도 자신감 있게 대답할 수 있었다. 아버지의 조언대로 '배움의 과정'을 강조했을 때 면접관의 반응이 좋았다.",
-        "date": "2026-08-17T16:00:00",
-        "createdAt": "2026-08-17T16:00:00"
       }
     ],
     "포트폴리오": [
       {
-        "id": "d30",
+        "id": "d16",
         "category": "포트폴리오",
         "title": "포트폴리오 구성",
         "label": "준비",
         "content": "포트폴리오 사이트를 만들었다. 그동안의 프로젝트, 알고리즘 경험, 기술 스택들을 깔끔하게 정리했다. 마크다운으로 문서화하고, 이미지와 링크를 추가했다. 이제 자신감 있게 포트폴리오를 보여줄 수 있을 것 같다.",
         "date": "2026-08-25T12:00:00",
         "createdAt": "2026-08-25T12:00:00"
-      },
-      {
-        "id": "d31",
-        "category": "포트폴리오",
-        "title": "포트폴리오와 취업",
-        "label": "연결",
-        "content": "포트폴리오를 잘 준비했을 때와 아닐 때의 면접 경험이 정말 다르다는 것을 느낀다. 좋은 포트폴리오는 나를 대신 말해주는 매개체가 된다. 이것이 왜 중요한지 이제 정말 잘 이해한다.",
-        "date": "2026-08-21T13:00:00",
-        "createdAt": "2026-08-21T13:00:00"
       }
     ],
     "인턴": [
       {
-        "id": "d32",
+        "id": "d17",
         "category": "인턴",
         "title": "인턴 준비",
         "label": "준비",
         "content": "인턴 준비를 본격적으로 시작했다. 회사에 대해 공부하고, 기술 스택을 미리 학습했다. 누나의 조언도 많은 도움이 되었다. 특히 '배운다는 마음가짐'이 중요하다는 말이 자꾸 생각난다.",
         "date": "2026-08-23T10:00:00",
         "createdAt": "2026-08-23T10:00:00"
-      },
-      {
-        "id": "d33",
-        "category": "인턴",
-        "title": "인턴의 의미",
-        "label": "성장",
-        "content": "첫 인턴이 주는 의미는 크다. 이것은 단순히 경험을 쌓는 것 이상이다. 내가 어떤 분야를 좋아하는지, 어떤 회사 문화가 맞는지를 배우는 과정이다. 이 선택이 향후 커리어의 첫 단계가 될 것이다.",
-        "date": "2026-08-13T11:00:00",
-        "createdAt": "2026-08-13T11:00:00"
       }
     ],
     "친구": [
       {
-        "id": "d34",
+        "id": "d18",
         "category": "친구",
         "title": "친구들과의 만남",
         "label": "우정",
         "content": "오랜만에 친구들과 모두 만났다. 각자 다른 길을 가고 있지만, 함께할 때는 여전히 그대로인 것 같다. 같은 학기를 지나온 친구들의 경험담을 듣는 것이 좋다. 이런 우정이 정말 소중하다.",
         "date": "2026-08-27T20:00:00",
         "createdAt": "2026-08-27T20:00:00"
-      },
-      {
-        "id": "d35",
-        "category": "친구",
-        "title": "친구의 응원",
-        "label": "격려",
-        "content": "친구들이 내 인턴 준비를 응원해준다. 면접 준비를 함께하고, 포트폴리오를 검토해주기도 한다. 이렇게 서로를 지지하는 관계가 있다는 것이 정말 행운이다. 앞으로도 함께 성장하고 싶다.",
-        "date": "2026-08-11T18:30:00",
-        "createdAt": "2026-08-11T18:30:00"
       }
     ],
     "아버지 커리어": [
       {
-        "id": "d36",
+        "id": "d19",
         "category": "아버지 커리어",
         "title": "아버지의 첫 직장",
         "label": "경험",
@@ -827,7 +674,7 @@ window.EXAMPLE_DATA = {
     ],
     "어머니 양육": [
       {
-        "id": "d37",
+        "id": "d20",
         "category": "어머니 양육",
         "title": "어머니의 선택",
         "label": "결정",
@@ -838,7 +685,7 @@ window.EXAMPLE_DATA = {
     ],
     "데이터 분석": [
       {
-        "id": "d38",
+        "id": "d21",
         "category": "데이터 분석",
         "title": "데이터 분석의 깊이",
         "label": "기술",
@@ -849,7 +696,7 @@ window.EXAMPLE_DATA = {
     ],
     "웹 개발": [
       {
-        "id": "d39",
+        "id": "d22",
         "category": "웹 개발",
         "title": "웹 개발의 매력",
         "label": "기술",
@@ -860,7 +707,7 @@ window.EXAMPLE_DATA = {
     ],
     "포트폴리오 사이트": [
       {
-        "id": "d40",
+        "id": "d23",
         "category": "포트폴리오 사이트",
         "title": "포트폴리오 완성",
         "label": "완성",
@@ -871,7 +718,7 @@ window.EXAMPLE_DATA = {
     ],
     "인턴 면접": [
       {
-        "id": "d41",
+        "id": "d24",
         "category": "인턴 면접",
         "title": "인턴 면접 회고",
         "label": "경험",

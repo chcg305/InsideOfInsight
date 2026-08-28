@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎬 Animation 강제 테스트</title>
+<link rel="stylesheet" href="css/main.css">
+<style>
+  body { padding: 20px; }
+  .control { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+  button { padding: 12px 24px; margin: 5px; font-size: 14px; cursor: pointer; border: none; border-radius: 4px; background: #2196f3; color: white; }
+  button:hover { background: #1976d2; }
+  button.start { background: #4caf50; }
+  button.start:hover { background: #45a049; }
+  .status { padding: 10px; background: #f5f5f5; border-radius: 4px; margin-top: 10px; font-family: monospace; font-size: 12px; }
+</style>
+</head>
+<body>
+<h1>🎬 Animation 강제 테스트</h1>
+
+<div class="control">
+  <h2>테스트 시나리오</h2>
+  <button class="start" onclick="testFocusAnimation()">부모 Node → Focus Animation</button>
+  <button onclick="testPhysicsTick()">Physics Tick 실행</button>
+  <button onclick="testBoundaryConstraint()">Boundary Constraint 테스트</button>
+  <button onclick="visualizeNodes()">모든 Node 시각화</button>
+  <div class="status" id="status">대기 중...</div>
+</div>
+
+<div id="app"></div>
+<svg id="mindmapSvg" viewBox="0 0 900 570" style="border: 1px solid #ddd; width: 100%; height: 600px; background: white;"></svg>
+
+<script src="js/state.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/data/default-data.js"></script>
+<script src="js/data/example-data.js"></script>
+<script src="js/data/example-data-v2.js"></script>
+<script src="js/data/example-data-expanded.js"></script>
+<script src="js/features/physics.js"></script>
+<script src="js/features/render.js"></script>
+<script src="js/features/mindmap.js"></script>
+
+<script>
+const statusEl = document.getElementById('status');
+const svg = document.getElementById('mindmapSvg');
+
+function updateStatus(msg) {
+  const time = new Date().toLocaleTimeString();
+  statusEl.textContent += `[${time}] ${msg}\n`;
+  statusEl.scrollTop = statusEl.scrollHeight;
+}
+
+// Test 1: Focus Animation
+async function testFocusAnimation() {
+  updateStatus('=== Focus Animation 테스트 시작 ===');
+
+  try {
+    const state = I2IState.load();
+
+    // Root 노드 찾기
+    const root = state.nodes.find(n =>
+      !state.relationships.some(r => r.type === 'parent' && r.targetNodeId === n.id)
+    );
+
+    if (!root) {
+      updateStatus('❌ Root 노드 없음');
+      return;
+    }
+
+    updateStatus(`✅ Root 노드: ${root.name}`);
+
+    // 자식 확인
+    const childIds = state.relationships
+      .filter(r => r.type === 'parent' && r.sourceNodeId === root.id)
+      .map(r => r.targetNodeId);
+
+    if (childIds.length === 0) {
+      updateStatus('❌ 자식 노드 없음');
+      return;
+    }
+
+    updateStatus(`✅ 자식 노드 수: ${childIds.length}`);
+
+    // Animation 시작
+    if (!window.I2IMindmap.startFocusAnimation) {
+      updateStatus('❌ startFocusAnimation 함수 미존재');
+      return;
+    }
+
+    const focusAnimation = window.I2IMindmap.startFocusAnimation(root, childIds, state.nodes, state.relationships);
+    updateStatus('✅ Animation 생성됨');
+
+    // 10프레임 동안 실행
+    updateStatus('🎬 Animation 실행 중... (10프레임)');
+
+    let frameCount = 0;
+    const runAnimation = () => {
+      frameCount++;
+      updateStatus(`프레임 ${frameCount}: 부모 위치 (${root.position.x.toFixed(0)}, ${root.position.y.toFixed(0)})`);
+
+      if (frameCount < 10 && focusAnimation.isRunning()) {
+        requestAnimationFrame(runAnimation);
+      } else {
+        updateStatus('✅ Animation 완료');
+        visualizeAnimatedState(state, root, childIds);
+      }
+    };
+
+    requestAnimationFrame(runAnimation);
+
+  } catch (e) {
+    updateStatus(`❌ 오류: ${e.message}`);
+    console.error(e.stack);
+  }
+}
+
+// Test 2: Physics Tick
+function testPhysicsTick() {
+  updateStatus('=== Physics Tick 테스트 ===');
+
+  try {
+    const nodes = [
+      { id: '1', name: 'A', position: { x: 200, y: 285 } },
+      { id: '2', name: 'B', position: { x: 350, y: 200 } },
+      { id: '3', name: 'C', position: { x: 350, y: 370 } }
+    ];
+
+    const rels = [
+      { id: 'r1', sourceNodeId: '1', targetNodeId: '2', type: 'parent' },
+      { id: 'r2', sourceNodeId: '1', targetNodeId: '3', type: 'parent' }
+    ];
+
+    const sim = new I2IPhysics.PhysicsSimulation(nodes, rels);
+    updateStatus(`✅ Simulation 생성됨, 노드: ${nodes.length}`);
+
+    const positions = [];
+    for (let i = 0; i < 5; i++) {
+      sim.tick();
+      const pos = nodes[0].position;
+      positions.push(`${pos.x.toFixed(1)},${pos.y.toFixed(1)}`);
+    }
+
+    updateStatus(`✅ 5 Tick 실행 완료`);
+    updateStatus(`노드 0 위치 변화: [${positions.join(' → ')}]`);
+
+    if (positions[0] !== positions[4]) {
+      updateStatus('✅ Position이 변경됨 (Physics 작동 중)');
+    } else {
+      updateStatus('⚠️ Position이 동일함 (Physics 미작동?)');
+    }
+
+  } catch (e) {
+    updateStatus(`❌ 오류: ${e.message}`);
+  }
+}
+
+// Test 3: Boundary Constraint
+function testBoundaryConstraint() {
+  updateStatus('=== Boundary Constraint 테스트 ===');
+
+  try {
+    const state = I2IState.load();
+    const bounds = { minX: 64, maxX: 836, minY: 64, maxY: 506 };
+
+    const outOfBounds = state.nodes.filter(n =>
+      n.position.x < bounds.minX || n.position.x > bounds.maxX ||
+      n.position.y < bounds.minY || n.position.y > bounds.maxY
+    );
+
+    updateStatus(`총 노드: ${state.nodes.length}`);
+    updateStatus(`범위 내: ${state.nodes.length - outOfBounds.length}`);
+    updateStatus(`범위 밖: ${outOfBounds.length}`);
+
+    if (outOfBounds.length === 0) {
+      updateStatus('✅ 모든 노드가 범위 내');
+    } else {
+      updateStatus(`❌ 범위 밖 노드들:`);
+      outOfBounds.forEach(n => {
+        updateStatus(`   ${n.name}: (${n.position.x}, ${n.position.y})`);
+      });
+    }
+
+  } catch (e) {
+    updateStatus(`❌ 오류: ${e.message}`);
+  }
+}
+
+// Visualization
+function visualizeNodes() {
+  updateStatus('=== 노드 시각화 ===');
+
+  try {
+    const state = I2IState.load();
+    const svg = document.getElementById('mindmapSvg');
+
+    // SVG 초기화
+    svg.innerHTML = `
+      <defs>
+        <filter id="shadow"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity=".3"/></filter>
+      </defs>
+    `;
+
+    // 경계선 그리기
+    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('x', '64');
+    rect.setAttribute('y', '64');
+    rect.setAttribute('width', '772');
+    rect.setAttribute('height', '442');
+    rect.setAttribute('fill', 'none');
+    rect.setAttribute('stroke', '#ff9800');
+    rect.setAttribute('stroke-width', '2');
+    rect.setAttribute('stroke-dasharray', '5,5');
+    svg.appendChild(rect);
+
+    // 노드 그리기
+    state.nodes.forEach(node => {
+      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      circle.setAttribute('cx', node.position.x);
+      circle.setAttribute('cy', node.position.y);
+      circle.setAttribute('r', '32');
+      circle.setAttribute('fill', node.color || '#42a5f5');
+      circle.setAttribute('opacity', '0.8');
+      circle.setAttribute('filter', 'url(#shadow)');
+      svg.appendChild(circle);
+
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', node.position.x);
+      text.setAttribute('y', node.position.y);
+      text.setAttribute('text-anchor', 'middle');
+      text.setAttribute('dy', '.3em');
+      text.setAttribute('fill', '#fff');
+      text.setAttribute('font-size', '10');
+      text.setAttribute('font-weight', '700');
+      text.setAttribute('pointer-events', 'none');
+      text.textContent = node.name.slice(0, 8);
+      svg.appendChild(text);
+    });
+
+    updateStatus(`✅ ${state.nodes.length}개 노드 시각화 완료`);
+
+  } catch (e) {
+    updateStatus(`❌ 오류: ${e.message}`);
+  }
+}
+
+function visualizeAnimatedState(state, root, childIds) {
+  const svg = document.getElementById('mindmapSvg');
+  svg.innerHTML = `
+    <defs>
+      <filter id="shadow"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity=".3"/></filter>
+    </defs>
+  `;
+
+  // 경계선
+  const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  rect.setAttribute('x', '64');
+  rect.setAttribute('y', '64');
+  rect.setAttribute('width', '772');
+  rect.setAttribute('height', '442');
+  rect.setAttribute('fill', 'none');
+  rect.setAttribute('stroke', '#ff9800');
+  rect.setAttribute('stroke-width', '2');
+  rect.setAttribute('stroke-dasharray', '5,5');
+  svg.appendChild(rect);
+
+  // 부모와 자식만 그리기
+  const visibleIds = new Set([root.id, ...childIds]);
+
+  state.nodes.forEach(node => {
+    if (!visibleIds.has(node.id)) return;
+
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', node.position.x);
+    circle.setAttribute('cy', node.position.y);
+    circle.setAttribute('r', '32');
+    circle.setAttribute('fill', node.id === root.id ? '#2196f3' : '#4caf50');
+    circle.setAttribute('opacity', '0.9');
+    circle.setAttribute('filter', 'url(#shadow)');
+    svg.appendChild(circle);
+
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', node.position.x);
+    text.setAttribute('y', node.position.y);
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('dy', '.3em');
+    text.setAttribute('fill', '#fff');
+    text.setAttribute('font-size', '11');
+    text.setAttribute('font-weight', '700');
+    text.setAttribute('pointer-events', 'none');
+    text.textContent = node.name.slice(0, 10);
+    svg.appendChild(text);
+  });
+
+  updateStatus('✅ Animation 후 상태 시각화 완료');
+}
+
+// 초기화
+updateStatus('페이지 로드 완료');
+visualizeNodes();
+</script>
+</body>
+</html>

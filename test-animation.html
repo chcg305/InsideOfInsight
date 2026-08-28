@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎬 Animation 검증</title>
+<link rel="stylesheet" href="css/main.css">
+<style>
+  body { padding: 20px; background: #f5f5f5; }
+  .test-container { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+  h2 { margin-top: 0; color: #2196f3; }
+  button { padding: 10px 20px; margin: 5px; background: #4caf50; color: white; border: none; border-radius: 4px; cursor: pointer; }
+  button:hover { background: #45a049; }
+  .log { background: #f0f0f0; padding: 10px; border-radius: 4px; margin: 10px 0; font-size: 12px; font-family: monospace; max-height: 300px; overflow: auto; }
+  .pass { color: #2e7d32; }
+  .fail { color: #c62828; }
+</style>
+</head>
+<body>
+<h1>🎬 Physics Animation 검증</h1>
+
+<div class="test-container">
+  <h2>1️⃣ Focus Animation 테스트</h2>
+  <button onclick="testFocusAnimation()">Animation 실행</button>
+  <div id="log1" class="log">대기 중...</div>
+</div>
+
+<div class="test-container">
+  <h2>2️⃣ Repulsion 안정성 테스트</h2>
+  <button onclick="testRepulsionStability()">Repulsion 테스트</button>
+  <div id="log2" class="log">대기 중...</div>
+</div>
+
+<div class="test-container">
+  <h2>3️⃣ 경계 제약 검증</h2>
+  <button onclick="testBoundary()">경계 확인</button>
+  <div id="log3" class="log">대기 중...</div>
+</div>
+
+<script src="js/state.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/data/default-data.js"></script>
+<script src="js/features/physics.js"></script>
+
+<script>
+function log(elementId, msg, isPass = null) {
+  const el = document.getElementById(elementId);
+  const className = isPass === true ? 'pass' : isPass === false ? 'fail' : '';
+  el.innerHTML += `<div class="${className}">${msg}</div>`;
+  el.scrollTop = el.scrollHeight;
+}
+
+function testFocusAnimation() {
+  document.getElementById('log1').innerHTML = '';
+  log('log1', '=== Focus Animation 테스트 시작 ===');
+
+  try {
+    // 간단한 그래프 생성
+    const nodes = [
+      { id: 'root', position: { x: 100, y: 100 } },
+      { id: 'child1', position: { x: 200, y: 200 } },
+      { id: 'child2', position: { x: 300, y: 200 } },
+    ];
+
+    const rels = [
+      { type: 'parent', sourceNodeId: 'root', targetNodeId: 'child1' },
+      { type: 'parent', sourceNodeId: 'root', targetNodeId: 'child2' },
+    ];
+
+    log('log1', `✓ 노드 생성: ${nodes.length}개`);
+    log('log1', `✓ 관계 생성: ${rels.length}개`);
+
+    // Physics Simulation 생성
+    const sim = new I2IPhysics.PhysicsSimulation(nodes, rels, {
+      repulsionStrength: -100,
+      linkDistance: 120,
+      damping: 0.7,
+      alphaMin: 0.001,
+      alphaDecay: 0.03,
+      velocityMax: 1.5
+    });
+
+    log('log1', `✓ Physics Simulation 생성됨`);
+
+    // 시뮬레이션 시작
+    sim.start();
+    log('log1', `✓ Simulation 시작 (alpha=${sim.alpha})`);
+
+    // 30 frames 실행
+    const initialPositions = nodes.map(n => ({ ...n.position }));
+
+    for (let i = 0; i < 30; i++) {
+      sim.tick();
+
+      if (i === 0 || i === 9 || i === 19 || i === 29) {
+        log('log1', `Frame ${i+1}: Root(${nodes[0].position.x.toFixed(0)},${nodes[0].position.y.toFixed(0)}) Alpha=${sim.alpha.toFixed(4)} Running=${sim.isRunning}`);
+      }
+
+      if (!sim.isRunning) {
+        log('log1', `🛑 Simulation 수렴 (frame ${i+1})`, true);
+        break;
+      }
+    }
+
+    // 검증
+    const rootMoved = Math.abs(nodes[0].position.x - initialPositions[0].x) > 1 ||
+                      Math.abs(nodes[0].position.y - initialPositions[0].y) > 1;
+    const childrenSeparated = Math.sqrt(
+      (nodes[1].position.x - nodes[2].position.x) ** 2 +
+      (nodes[1].position.y - nodes[2].position.y) ** 2
+    ) > 100;
+
+    log('log1', `✓ Root 이동: ${rootMoved ? '예' : '아니오'}`, rootMoved);
+    log('log1', `✓ 자식들 분리: ${childrenSeparated ? '예' : '아니오'}`, childrenSeparated);
+
+    if (rootMoved && childrenSeparated) {
+      log('log1', `✅ Animation 정상 작동!`, true);
+    } else {
+      log('log1', `❌ Animation 미작동`, false);
+    }
+
+  } catch (e) {
+    log('log1', `❌ 오류: ${e.message}`, false);
+    console.error(e.stack);
+  }
+}
+
+function testRepulsionStability() {
+  document.getElementById('log2').innerHTML = '';
+  log('log2', '=== Repulsion 안정성 테스트 ===');
+
+  try {
+    // 겹친 노드들
+    const nodes = [
+      { id: 'a', position: { x: 200, y: 200 } },
+      { id: 'b', position: { x: 220, y: 200 } },
+      { id: 'c', position: { x: 210, y: 220 } },
+    ];
+
+    const rels = [];
+
+    log('log2', `✓ 겹친 노드 3개 생성`);
+
+    const sim = new I2IPhysics.PhysicsSimulation(nodes, rels, {
+      repulsionStrength: -100,
+      linkDistance: 120,
+      damping: 0.7,
+      alphaMin: 0.001,
+      alphaDecay: 0.03,
+      velocityMax: 1.5
+    });
+
+    // 50 frames 실행
+    let maxOscillation = 0;
+    const positionsHistory = [];
+
+    for (let i = 0; i < 50; i++) {
+      sim.tick();
+      const distAB = Math.sqrt(
+        (nodes[1].position.x - nodes[0].position.x) ** 2 +
+        (nodes[1].position.y - nodes[0].position.y) ** 2
+      );
+      positionsHistory.push(distAB);
+
+      if (i >= 10) {
+        const prevDist = positionsHistory[i - 1];
+        const oscillation = Math.abs(distAB - prevDist);
+        maxOscillation = Math.max(maxOscillation, oscillation);
+      }
+
+      if (i === 9 || i === 24 || i === 49) {
+        log('log2', `Frame ${i+1}: 거리AB=${distAB.toFixed(1)}px Alpha=${sim.alpha.toFixed(4)}`);
+      }
+
+      if (!sim.isRunning) {
+        log('log2', `✓ 수렴 (frame ${i+1})`);
+        break;
+      }
+    }
+
+    const finalDist = Math.sqrt(
+      (nodes[1].position.x - nodes[0].position.x) ** 2 +
+      (nodes[1].position.y - nodes[0].position.y) ** 2
+    );
+
+    log('log2', `최종 거리 AB: ${finalDist.toFixed(1)}px`);
+    log('log2', `최대 진동: ${maxOscillation.toFixed(2)}px/frame`);
+
+    const isStable = maxOscillation < 5 && finalDist > 80;
+    if (isStable) {
+      log('log2', `✅ Repulsion 안정적!`, true);
+    } else {
+      log('log2', `❌ 진동 과다 또는 분리 불충분`, false);
+    }
+
+  } catch (e) {
+    log('log2', `❌ 오류: ${e.message}`, false);
+  }
+}
+
+function testBoundary() {
+  document.getElementById('log3').innerHTML = '';
+  log('log3', '=== 경계 제약 검증 ===');
+
+  try {
+    const nodes = [
+      { id: 'a', position: { x: 10, y: 10 } },
+      { id: 'b', position: { x: 900, y: 600 } },
+    ];
+
+    const rels = [];
+
+    const sim = new I2IPhysics.PhysicsSimulation(nodes, rels, {
+      repulsionStrength: -100,
+      linkDistance: 120,
+      damping: 0.7,
+      alphaMin: 0.001,
+      alphaDecay: 0.03,
+      velocityMax: 1.5
+    });
+
+    log('log3', `초기: A=(${nodes[0].position.x}, ${nodes[0].position.y}) B=(${nodes[1].position.x}, ${nodes[1].position.y})`);
+
+    sim.start();
+    for (let i = 0; i < 10; i++) {
+      sim.tick();
+    }
+
+    const bounds = { minX: 64, maxX: 836, minY: 64, maxY: 506 };
+    const minX = bounds.minX + 32;
+    const maxX = bounds.maxX - 32;
+    const minY = bounds.minY + 32;
+    const maxY = bounds.maxY - 32;
+
+    const aInBounds = nodes[0].position.x >= minX && nodes[0].position.x <= maxX &&
+                      nodes[0].position.y >= minY && nodes[0].position.y <= maxY;
+    const bInBounds = nodes[1].position.x >= minX && nodes[1].position.x <= maxX &&
+                      nodes[1].position.y >= minY && nodes[1].position.y <= maxY;
+
+    log('log3', `최종: A=(${nodes[0].position.x.toFixed(0)}, ${nodes[0].position.y.toFixed(0)}) B=(${nodes[1].position.x.toFixed(0)}, ${nodes[1].position.y.toFixed(0)})`);
+    log('log3', `A 경계 내: ${aInBounds}`, aInBounds);
+    log('log3', `B 경계 내: ${bInBounds}`, bInBounds);
+
+    if (aInBounds && bInBounds) {
+      log('log3', `✅ 모든 노드 경계 내!`, true);
+    } else {
+      log('log3', `❌ 일부 노드 경계 외`, false);
+    }
+
+  } catch (e) {
+    log('log3', `❌ 오류: ${e.message}`, false);
+  }
+}
+
+window.addEventListener('load', () => {
+  log('log1', '페이지 로드 완료');
+  log('log2', '준비 완료');
+  log('log3', '준비 완료');
+});
+</script>
+</body>
+</html>

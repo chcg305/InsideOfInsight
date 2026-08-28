@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔍 진단</title>
+<style>
+  body { font-family: system-ui; padding: 20px; background: #f5f5f5; }
+  .section { background: white; margin: 10px 0; padding: 15px; border-radius: 8px; border-left: 4px solid #2196f3; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; }
+  .error { border-left-color: #f44336; color: #b71c1c; }
+  .warning { border-left-color: #ff9800; color: #e65100; }
+  .success { border-left-color: #4caf50; color: #1b5e20; }
+  button { padding: 10px 20px; margin: 5px; background: #2196f3; color: white; border: none; border-radius: 4px; cursor: pointer; }
+  button:hover { background: #1976d2; }
+  #output { background: #1e1e1e; color: #00ff00; padding: 15px; border-radius: 4px; font-family: monospace; font-size: 12px; max-height: 400px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; }
+</style>
+</head>
+<body>
+<h1>🔍 InsideToInsight 진단</h1>
+
+<div class="section">
+  <h2>📋 진단 항목</h2>
+  <button onclick="testPhysicsLoaded()">1️⃣ Physics 엔진 로드</button>
+  <button onclick="testMindmapFunctions()">2️⃣ Mindmap 함수</button>
+  <button onclick="testAnimationSetup()">3️⃣ Animation 설정</button>
+  <button onclick="testBoundaryLogic()">4️⃣ Boundary 로직</button>
+  <button onclick="testNodePositions()">5️⃣ Node 위치</button>
+  <button onclick="clearOutput()">🗑️ 초기화</button>
+</div>
+
+<div class="section">
+  <h2>🖥️ 진단 결과</h2>
+  <div id="output">대기 중...</div>
+</div>
+
+<script src="js/state.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/data/default-data.js"></script>
+<script src="js/data/example-data.js"></script>
+<script src="js/data/example-data-v2.js"></script>
+<script src="js/data/example-data-expanded.js"></script>
+<script src="js/features/physics.js"></script>
+<script src="js/features/render.js"></script>
+<script src="js/features/mindmap.js"></script>
+
+<script>
+const output = document.getElementById('output');
+
+function log(msg, type = 'info') {
+  const prefix = type === 'error' ? '❌' : type === 'warning' ? '⚠️' : '✅';
+  output.textContent += `${prefix} ${msg}\n`;
+  output.parentElement.className = `section ${type === 'error' ? 'error' : type === 'warning' ? 'warning' : 'success'}`;
+}
+
+function clearOutput() {
+  output.textContent = '';
+}
+
+function testPhysicsLoaded() {
+  clearOutput();
+  output.textContent = '=== Physics 엔진 진단 ===\n\n';
+
+  try {
+    if (!window.I2IPhysics) {
+      log('I2IPhysics 미로드', 'error');
+      return;
+    }
+
+    if (!window.I2IPhysics.PhysicsSimulation) {
+      log('PhysicsSimulation 클래스 미존재', 'error');
+      return;
+    }
+
+    log('I2IPhysics 로드됨');
+    log('PhysicsSimulation 클래스 존재');
+
+    // 간단한 테스트
+    const nodes = [
+      { id: '1', name: 'A', position: { x: 100, y: 100 } },
+      { id: '2', name: 'B', position: { x: 200, y: 100 } }
+    ];
+    const rels = [
+      { id: 'r1', sourceNodeId: '1', targetNodeId: '2', type: 'parent' }
+    ];
+
+    const sim = new window.I2IPhysics.PhysicsSimulation(nodes, rels);
+    log(`Simulation 인스턴스 생성 성공`);
+    log(`Alpha: ${sim.alpha}`);
+    log(`Nodes: ${sim.nodes.length}`);
+    log(`Velocities: ${sim.velocities.size}`);
+
+    // Tick 실행
+    sim.tick();
+    sim.tick();
+    log(`Tick 2회 실행 완료, Alpha: ${sim.alpha.toFixed(4)}`);
+
+  } catch (e) {
+    log(`오류: ${e.message}`, 'error');
+  }
+}
+
+function testMindmapFunctions() {
+  clearOutput();
+  output.textContent = '=== Mindmap 함수 진단 ===\n\n';
+
+  try {
+    if (!window.I2IMindmap) {
+      log('I2IMindmap 미로드', 'error');
+      return;
+    }
+
+    log('I2IMindmap 로드됨');
+
+    const funcs = ['draw', 'arrangeChildNodes', 'getNodeLayer', 'startFocusAnimation'];
+    funcs.forEach(fn => {
+      if (typeof window.I2IMindmap[fn] === 'function') {
+        log(`${fn} 함수 존재`);
+      } else {
+        log(`${fn} 함수 미존재`, 'warning');
+      }
+    });
+
+  } catch (e) {
+    log(`오류: ${e.message}`, 'error');
+  }
+}
+
+function testAnimationSetup() {
+  clearOutput();
+  output.textContent = '=== Animation 설정 진단 ===\n\n';
+
+  try {
+    const state = I2IState.load();
+    log(`State 로드 완료`);
+
+    // Root 노드 찾기
+    const root = state.nodes.find(n =>
+      !state.relationships.some(r => r.type === 'parent' && r.targetNodeId === n.id)
+    );
+
+    if (!root) {
+      log('Root 노드 없음', 'warning');
+      return;
+    }
+
+    log(`Root 노드: ${root.name} (${root.id})`);
+
+    // 자식 찾기
+    const childIds = state.relationships
+      .filter(r => r.type === 'parent' && r.sourceNodeId === root.id)
+      .map(r => r.targetNodeId);
+
+    log(`자식 노드 수: ${childIds.length}`);
+
+    if (childIds.length === 0) {
+      log('자식이 없어서 Animation 테스트 불가', 'warning');
+      return;
+    }
+
+    // startFocusAnimation 함수 확인
+    if (typeof window.I2IMindmap.startFocusAnimation !== 'function') {
+      log('startFocusAnimation 함수 미존재', 'error');
+      return;
+    }
+
+    log('startFocusAnimation 함수 존재');
+
+    // 함수 실행 테스트 (실행하지 말고 구조만 확인)
+    log(`Animation 설정 준비 완료`);
+
+  } catch (e) {
+    log(`오류: ${e.message}`, 'error');
+  }
+}
+
+function testBoundaryLogic() {
+  clearOutput();
+  output.textContent = '=== Boundary 로직 진단 ===\n\n';
+
+  try {
+    // 경계 값 확인
+    const viewBox = { w: 900, h: 570 };
+    const nodeRadius = 32;
+    const margins = 32;
+
+    const bounds = {
+      minX: margins + nodeRadius,
+      maxX: viewBox.w - nodeRadius - margins,
+      minY: margins + nodeRadius,
+      maxY: viewBox.h - nodeRadius - margins
+    };
+
+    log(`ViewBox: ${viewBox.w}×${viewBox.h}`);
+    log(`Node Radius: ${nodeRadius}`);
+    log(`Margin: ${margins}`);
+    log(`\nBoundary 범위:`);
+    log(`  X: ${bounds.minX} ~ ${bounds.maxX}`);
+    log(`  Y: ${bounds.minY} ~ ${bounds.maxY}`);
+
+    // 실제 노드 위치 확인
+    const state = I2IState.load();
+    const nodes = state.nodes;
+
+    const outOfBounds = nodes.filter(n =>
+      n.position.x < bounds.minX || n.position.x > bounds.maxX ||
+      n.position.y < bounds.minY || n.position.y > bounds.maxY
+    );
+
+    log(`\n실제 노드 위치:`);
+    log(`  총 노드: ${nodes.length}`);
+    log(`  범위 내: ${nodes.length - outOfBounds.length}`);
+    log(`  범위 밖: ${outOfBounds.length}`);
+
+    if (outOfBounds.length > 0) {
+      log(`범위 밖 노드들:`, 'warning');
+      outOfBounds.slice(0, 5).forEach(n => {
+        log(`  ${n.name}: (${n.position.x}, ${n.position.y})`);
+      });
+    }
+
+  } catch (e) {
+    log(`오류: ${e.message}`, 'error');
+  }
+}
+
+function testNodePositions() {
+  clearOutput();
+  output.textContent = '=== Node 위치 진단 ===\n\n';
+
+  try {
+    const state = I2IState.load();
+    const nodes = state.nodes;
+
+    const xCoords = nodes.map(n => n.position.x);
+    const yCoords = nodes.map(n => n.position.y);
+
+    log(`노드 수: ${nodes.length}`);
+    log(`\nX 좌표 범위:`);
+    log(`  최소: ${Math.min(...xCoords)}`);
+    log(`  최대: ${Math.max(...xCoords)}`);
+    log(`\nY 좌표 범위:`);
+    log(`  최소: ${Math.min(...yCoords)}`);
+    log(`  최대: ${Math.max(...yCoords)}`);
+
+    // 데이터별 분석
+    const datasets = [
+      { name: 'DEFAULT_DATA', data: window.DEFAULT_DATA },
+      { name: 'EXAMPLE_DATA', data: window.EXAMPLE_DATA },
+      { name: 'EXAMPLE_DATA_V2', data: window.EXAMPLE_DATA_V2 },
+      { name: 'EXAMPLE_DATA_EXPANDED', data: window.EXAMPLE_DATA_EXPANDED }
+    ];
+
+    log(`\n데이터셋별 범위:`);
+    datasets.forEach(ds => {
+      if (ds.data && ds.data.nodes) {
+        const xs = ds.data.nodes.map(n => n.position.x);
+        const ys = ds.data.nodes.map(n => n.position.y);
+        log(`  ${ds.name}: X(${Math.min(...xs)}~${Math.max(...xs)}) Y(${Math.min(...ys)}~${Math.max(...ys)})`);
+      }
+    });
+
+  } catch (e) {
+    log(`오류: ${e.message}`, 'error');
+  }
+}
+
+// 초기 로드 테스트
+window.addEventListener('load', () => {
+  log('페이지 로드 완료');
+  log('모든 스크립트 로드됨\n');
+});
+</script>
+</body>
+</html>

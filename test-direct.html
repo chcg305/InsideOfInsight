@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎬 직접 Animation 테스트</title>
+<link rel="stylesheet" href="css/main.css">
+<style>
+  body { padding: 20px; background: #f5f5f5; }
+  .test-container { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+  h2 { margin-top: 0; color: #2196f3; }
+  button { padding: 10px 20px; margin: 5px; background: #4caf50; color: white; border: none; border-radius: 4px; cursor: pointer; }
+  button:hover { background: #45a049; }
+  #canvas { border: 2px solid #2196f3; width: 100%; height: 600px; background: white; margin-top: 10px; }
+  .info { background: #e3f2fd; padding: 10px; border-radius: 4px; margin: 10px 0; font-size: 12px; }
+</style>
+</head>
+<body>
+<h1>🎬 Animation 직접 테스트</h1>
+
+<div class="test-container">
+  <h2>1️⃣ Physics + Animation 검증</h2>
+  <button onclick="testAnimationFlow()">Animation Flow 실행</button>
+  <div id="log1" class="info">대기 중...</div>
+</div>
+
+<div class="test-container">
+  <h2>2️⃣ Boundary 검증</h2>
+  <button onclick="testBoundary()">경계 검사</button>
+  <div id="log2" class="info">대기 중...</div>
+</div>
+
+<div class="test-container">
+  <h2>3️⃣ Animation 시각화</h2>
+  <canvas id="canvas"></canvas>
+  <div id="log3" class="info">Canvas 표시 영역</div>
+</div>
+
+<script src="js/state.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/data/default-data.js"></script>
+<script src="js/data/example-data.js"></script>
+<script src="js/data/example-data-v2.js"></script>
+<script src="js/data/example-data-expanded.js"></script>
+<script src="js/features/physics.js"></script>
+
+<script>
+function log(elementId, msg) {
+  const el = document.getElementById(elementId);
+  el.innerHTML += msg + '<br>';
+  el.scrollTop = el.scrollHeight;
+}
+
+function testAnimationFlow() {
+  document.getElementById('log1').innerHTML = '';
+  log('log1', '=== Animation 테스트 ===');
+
+  try {
+    const state = I2IState.load();
+    log('log1', `✅ State 로드: ${state.nodes.length}노드`);
+
+    // Root 찾기
+    const root = state.nodes.find(n =>
+      !state.relationships.some(r => r.type === 'parent' && r.targetNodeId === n.id)
+    );
+    log('log1', `✅ Root: ${root.name} @(${root.position.x.toFixed(0)}, ${root.position.y.toFixed(0)})`);
+
+    // 자식 찾기
+    const childIds = state.relationships
+      .filter(r => r.type === 'parent' && r.sourceNodeId === root.id)
+      .map(r => r.targetNodeId);
+    log('log1', `✅ 자식: ${childIds.length}개`);
+
+    // Physics 시뮬레이션 (원본 참조 사용!)
+    const visibleNodeIds = new Set([root.id, ...childIds]);
+    const visibleNodes = state.nodes.filter(n => visibleNodeIds.has(n.id));  // ✅ 원본!
+
+    const visibleRels = state.relationships.filter(r =>
+      visibleNodeIds.has(r.sourceNodeId) && visibleNodeIds.has(r.targetNodeId)
+    );
+
+    log('log1', `✅ Visible nodes: ${visibleNodes.length}`);
+
+    // Simulation 생성
+    const sim = new I2IPhysics.PhysicsSimulation(visibleNodes, visibleRels, {
+      repulsionStrength: -100,
+      linkDistance: 100,
+      damping: 0.4,
+      alphaMin: 0.0005,
+      alphaDecay: 0.02,
+      velocityMax: 2.0
+    });
+
+    log('log1', `✅ Simulation 생성`);
+
+    // 초기 velocity
+    const centerX = 450, centerY = 285;
+    const dx = centerX - root.position.x;
+    const dy = centerY - root.position.y;
+    const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+    const moveSpeed = Math.min(8, dist / 5);
+
+    sim.velocities.set(root.id, {
+      x: (dx / dist) * moveSpeed,
+      y: (dy / dist) * moveSpeed
+    });
+
+    log('log1', `부모 초기 위치: (${root.position.x.toFixed(0)}, ${root.position.y.toFixed(0)})`);
+    log('log1', `부모 초기 velocity: (${sim.velocities.get(root.id).x.toFixed(2)}, ${sim.velocities.get(root.id).y.toFixed(2)})`);
+    log('log1', `목표 위치: (${centerX}, ${centerY})`);
+
+    // 시뮬레이션 실행
+    sim.start();
+    log('log1', `✅ Simulation 시작\n`);
+
+    const initialX = root.position.x;
+    const frames = [];
+
+    for (let i = 0; i < 20; i++) {
+      sim.tick();
+      frames.push({
+        frame: i + 1,
+        rootX: root.position.x,
+        rootY: root.position.y,
+        alpha: sim.alpha,
+        running: sim.isRunning
+      });
+
+      if (i < 3 || i % 5 === 0 || i === 19) {
+        log('log1', `Frame ${i+1}: (${root.position.x.toFixed(0)}, ${root.position.y.toFixed(0)}) Alpha=${sim.alpha.toFixed(4)}`);
+      }
+
+      if (!sim.isRunning) {
+        log('log1', `🛑 Simulation 수렴 (frame ${i+1})`);
+        break;
+      }
+    }
+
+    const finalX = root.position.x;
+    const movement = Math.abs(finalX - initialX);
+
+    log('log1', `\n📊 결과:`);
+    log('log1', `부모 이동 거리: ${movement.toFixed(1)}px`);
+
+    if (movement > 2) {
+      log('log1', `✅ Animation 작동! Position이 변경됨`);
+    } else {
+      log('log1', `❌ Animation 미작동! Position 변경 없음`);
+    }
+
+  } catch (e) {
+    log('log1', `❌ 오류: ${e.message}`);
+    console.error(e.stack);
+  }
+}
+
+function testBoundary() {
+  document.getElementById('log2').innerHTML = '';
+  log('log2', '=== Boundary 검사 ===');
+
+  try {
+    const bounds = { minX: 64, maxX: 836, minY: 64, maxY: 506 };
+    const state = I2IState.load();
+
+    const outOfBounds = state.nodes.filter(n =>
+      n.position.x < bounds.minX || n.position.x > bounds.maxX ||
+      n.position.y < bounds.minY || n.position.y > bounds.maxY
+    );
+
+    const xs = state.nodes.map(n => n.position.x);
+    const ys = state.nodes.map(n => n.position.y);
+
+    log('log2', `범위 설정: X(${bounds.minX}~${bounds.maxX}), Y(${bounds.minY}~${bounds.maxY})`);
+    log('log2', `실제 범위: X(${Math.min(...xs).toFixed(0)}~${Math.max(...xs).toFixed(0)}), Y(${Math.min(...ys).toFixed(0)}~${Math.max(...ys).toFixed(0)})`);
+    log('log2', `총 노드: ${state.nodes.length}`);
+    log('log2', `범위 내: ${state.nodes.length - outOfBounds.length}`);
+
+    if (outOfBounds.length === 0) {
+      log('log2', `✅ 모든 노드가 경계 내!`);
+    } else {
+      log('log2', `❌ 범위 밖: ${outOfBounds.length}개`);
+      outOfBounds.slice(0, 5).forEach(n => {
+        log('log2', `   ${n.name}: (${n.position.x}, ${n.position.y})`);
+      });
+    }
+
+  } catch (e) {
+    log('log2', `❌ 오류: ${e.message}`);
+  }
+}
+
+// 초기 로드
+window.addEventListener('load', () => {
+  log('log1', '페이지 로드 완료');
+  log('log2', '준비 완료');
+});
+</script>
+</body>
+</html>
