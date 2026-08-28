@@ -1,0 +1,29 @@
+{
+  "hooks": {
+    "postToolUse": [
+      {
+        "tool": ["Edit", "Write"],
+        "event": "after",
+        "script": ".claude/hooks/validate-files.sh",
+        "description": "파일 수정 직후 검증 (JS 문법, git 상태, 파일 무결성)"
+      }
+    ],
+    "preToolUse": [
+      {
+        "tool": ["Bash"],
+        "event": "before",
+        "script": ".claude/hooks/guard-dangerous-commands.sh",
+        "description": "위험한 명령(git reset, rm -rf 등) 차단"
+      }
+    ]
+  },
+  "permissions": {
+    "allowByDefault": [],
+    "prompt": [
+      "Read",
+      "Bash",
+      "Edit",
+      "Write"
+    ]
+  }
+}
